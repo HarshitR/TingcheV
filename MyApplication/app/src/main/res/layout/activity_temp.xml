@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.iot.tingchev.TempActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="You are being charged for the following car"
+        android:textSize="20dp"
+        android:textColor="#000"
+        android:padding="20dp"/>
+
+    <LinearLayout
+        android:id="@+id/parkedCar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_alignParentBottom="true"
+        android:background="#eee"
+        android:layout_margin="30dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SN F 3632"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:fontFamily="serif"
+            android:layout_marginBottom="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parked at Mihn Skate Park, 15 min ago"
+            android:textStyle="italic"
+            android:textSize="15dp"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+</RelativeLayout>

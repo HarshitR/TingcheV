@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.iot.tingchev.mapscreen.CityMapActivity"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="15dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:imeOptions="actionGo"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:background="@drawable/searchbar_bg"
+        android:drawableRight="@drawable/places_ic_search"/>
+
+    <ImageButton
+        android:id="@+id/grab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="30dp"
+        android:background="#00ffffff"
+        android:src="@drawable/circle_grab"/>
+
+    <RelativeLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
+
+        <Button
+            android:id="@+id/push"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="SEARCH"
+            android:textSize="15dp"
+            android:background="@drawable/round_rect"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
