@@ -44,6 +44,8 @@ public class ParkListActivity extends ListActivity{
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Intent openSite = new Intent(this, CityMapActivity.class);
-        startActivity(openSite);
+        startActivity(openSite.putExtra("entry_point", "region")
+                .putExtra("lat", 0.0)
+                .putExtra("lng", 0.0));
     }
 }

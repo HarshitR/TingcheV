@@ -2,6 +2,7 @@ package com.iot.tingchev.mapscreen;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -36,7 +37,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.iot.tingchev.CarParkedActivity;
 import com.iot.tingchev.R;
+import com.iot.tingchev.parkinglist.ParkListActivity;
 
 public class CityMapActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -69,8 +72,10 @@ public class CityMapActivity extends FragmentActivity implements
         searchBar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_GO)
+                if (actionId == EditorInfo.IME_ACTION_GO) {
                     Toast.makeText(mActivity, v.getText().toString(), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(mActivity, ParkListActivity.class));
+                }
                 return false;
             }
         });
@@ -90,6 +95,95 @@ public class CityMapActivity extends FragmentActivity implements
         display = AnimationUtils.loadAnimation(this, R.anim.display_overlay);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent cIntent = getIntent();
+        String entry = cIntent.getStringExtra("entry_point");
+
+        switch(entry){
+            case "region" :
+                startActivity(new Intent(this, ParkListActivity.class));
+                break;
+            case "car_parked" :
+                startActivity(new Intent(this, CarParkedActivity.class));
+                break;
+            default:
+                super.onBackPressed();
+        }
+    }
+
+    protected void setCameraListener() {
+        Intent cIntent = getIntent();
+        String entry = cIntent.getStringExtra("entry_point");
+        GoogleMap.OnCameraChangeListener camlistener = null;
+
+        if (entry != null){
+            switch(entry){
+                case "car_parked" :
+                    final LatLng car = new LatLng(cIntent.getDoubleExtra("lat",0.0), cIntent.getDoubleExtra("lng",0.0));
+                    camlistener = new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            boolean move = false;
+                            if (cameraPosition.zoom<10)
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(car, 10f));
+
+                            if (cameraPosition.target.latitude > park.getBounds().northeast.latitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.longitude < park.getBounds().southwest.longitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.longitude > park.getBounds().northeast.longitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.latitude < park.getBounds().southwest.latitude) {
+                                move = true;
+                            }
+                            if (move)
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(car, 10f));
+                            Log.e("zoom level", ""+mMap.getCameraPosition().zoom);
+                        }
+                    };
+                    break;
+                case "region" :
+                    final LatLng center = new LatLng(cIntent.getDoubleExtra("lat",0.0), cIntent.getDoubleExtra("lng",0.0));
+                    camlistener = new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            boolean move = false;
+                            if (cameraPosition.zoom<10)
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 10f));
+
+                            if (cameraPosition.target.latitude > park.getBounds().northeast.latitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.longitude < park.getBounds().southwest.longitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.longitude > park.getBounds().northeast.longitude) {
+                                move = true;
+                            }
+                            if (cameraPosition.target.latitude < park.getBounds().southwest.latitude) {
+                                move = true;
+                            }
+                            if (move)
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 10f));
+                            Log.e("zoom level", ""+mMap.getCameraPosition().zoom);
+                        }
+                    };
+                    break;
+                case "normal" :
+                default:
+                    camlistener = new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {}
+                    };
+                    break;
+            }
+        }
+        mMap.setOnCameraChangeListener(camlistener);
+    }
 
     /**
      * Manipulates the map once available.
@@ -112,8 +206,9 @@ public class CityMapActivity extends FragmentActivity implements
         mMap.addMarker(new MarkerOptions().position(site).title("Parking SITE"));
         overlay = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher))
-                .position(circleOp, 80000f, 80000f);
+                .position(circleOp, 60000f, 60000f);
         park = mMap.addGroundOverlay(overlay);
+//        setCameraListener();
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {

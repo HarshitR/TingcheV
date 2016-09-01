@@ -8,9 +8,10 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.iot.tingchev.mapscreen.CityMapActivity;
 import com.iot.tingchev.parkinglist.ParkListActivity;
 
-public class TempActivity extends AppCompatActivity {
+public class CarParkedActivity extends AppCompatActivity {
 
     private LinearLayout carCard;
     private Activity mActivity;
@@ -25,8 +26,15 @@ public class TempActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mActivity, "Will open the location on map", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(mActivity, ParkListActivity.class));
+                startActivity(new Intent(mActivity, CityMapActivity.class)
+                        .putExtra("entry_point", "car_parked")
+                        /*.putExtra("lat", 0.0).putExtra("lng",0.0)*/);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, LandingPageActivity.class));
     }
 }

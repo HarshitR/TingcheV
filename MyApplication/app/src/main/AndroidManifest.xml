@@ -15,7 +15,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LandingPageActivity">
+        <activity android:name=".LandingPageActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,13 +35,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".TempActivity"
+        <activity android:name=".CarParkedActivity"
             android:theme="@style/MapTheme"/>
-        <activity android:name=".parkinglist.ParkListActivity" />
-        <activity android:name=".ParkingSiteActivity" />
+        <activity android:name=".parkinglist.ParkListActivity"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".mapscreen.CityMapActivity"
             android:label="@string/title_activity_city_map"
+            android:launchMode="singleTask"
             android:theme="@style/MapTheme" />
     </application>
 
