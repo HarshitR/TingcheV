@@ -45,7 +45,12 @@ public class ParkListActivity extends ListActivity{
         super.onListItemClick(l, v, position, id);
         Intent openSite = new Intent(this, CityMapActivity.class);
         startActivity(openSite.putExtra("entry_point", "region")
-                .putExtra("lat", 0.0)
-                .putExtra("lng", 0.0));
+                .putExtra("lat", 28.5288561)
+                .putExtra("lng", 76.8011377));
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, CityMapActivity.class).putExtra("entry_point", "normal"));
     }
 }

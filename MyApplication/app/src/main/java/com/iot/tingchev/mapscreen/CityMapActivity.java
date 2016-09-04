@@ -58,6 +58,8 @@ public class CityMapActivity extends FragmentActivity implements
     private final double latitude = 28.5288561;
     private final double longitude = 76.8011377;
     private Animation display;
+    private String entry = "";
+    private LatLng site;
 
 
     @Override
@@ -93,13 +95,18 @@ public class CityMapActivity extends FragmentActivity implements
             }
         });
         display = AnimationUtils.loadAnimation(this, R.anim.display_overlay);
+        entry = getIntent().getStringExtra("entry_point");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        entry = intent.getStringExtra("entry_point");
+        setCameraListener(intent);
+        super.onNewIntent(intent);
     }
 
     @Override
     public void onBackPressed() {
-        Intent cIntent = getIntent();
-        String entry = cIntent.getStringExtra("entry_point");
-
         switch(entry){
             case "region" :
                 startActivity(new Intent(this, ParkListActivity.class));
@@ -112,8 +119,8 @@ public class CityMapActivity extends FragmentActivity implements
         }
     }
 
-    protected void setCameraListener() {
-        Intent cIntent = getIntent();
+    protected void setCameraListener(Intent cIntent) {
+//        Intent cIntent = getIntent();
         String entry = cIntent.getStringExtra("entry_point");
         GoogleMap.OnCameraChangeListener camlistener = null;
 
@@ -121,6 +128,7 @@ public class CityMapActivity extends FragmentActivity implements
             switch(entry){
                 case "car_parked" :
                     final LatLng car = new LatLng(cIntent.getDoubleExtra("lat",0.0), cIntent.getDoubleExtra("lng",0.0));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(car, 10.5f));
                     camlistener = new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
@@ -148,6 +156,7 @@ public class CityMapActivity extends FragmentActivity implements
                     break;
                 case "region" :
                     final LatLng center = new LatLng(cIntent.getDoubleExtra("lat",0.0), cIntent.getDoubleExtra("lng",0.0));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 10.5f));
                     camlistener = new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {
@@ -175,6 +184,7 @@ public class CityMapActivity extends FragmentActivity implements
                     break;
                 case "normal" :
                 default:
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(site, 10.5f));
                     camlistener = new GoogleMap.OnCameraChangeListener() {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition) {}
@@ -185,31 +195,18 @@ public class CityMapActivity extends FragmentActivity implements
         mMap.setOnCameraChangeListener(camlistener);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        final boolean movecam=false;
-
-        // Add a marker in Sydney and move the camera
-        LatLng site = new LatLng(28.613, 77.210);
+        site = new LatLng(28.613, 77.210);
         final LatLng circleOp = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(site).title("Parking SITE"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(28.213, 77.212)).title("Lonavala").draggable(true));
         overlay = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher))
                 .position(circleOp, 60000f, 60000f);
         park = mMap.addGroundOverlay(overlay);
-//        setCameraListener();
-        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+        /*mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
                 boolean move = movecam;
@@ -232,9 +229,11 @@ public class CityMapActivity extends FragmentActivity implements
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(circleOp, 10f));
                 Log.e("zoom level", ""+mMap.getCameraPosition().zoom);
             }
-        });
+        });*/
+
         spot = mMap.addMarker(new MarkerOptions().position(circleOp).title("Circle OP"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(circleOp, 10.0f));
+        setCameraListener(getIntent());
 
         grab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,10 +247,10 @@ public class CityMapActivity extends FragmentActivity implements
     }
 
     private Marker[] markers = new Marker[10];
+    private GroundOverlay siteOverlay;
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Log.e("Found a", "Marker");
         int i=0;
         if (marker.getTitle().equals(spot.getTitle())){
             Log.e("Circle OP", "marker");
@@ -274,6 +273,31 @@ public class CityMapActivity extends FragmentActivity implements
                             .position(new LatLng(latitude+(0.0008*i), longitude+(0.0008*i)))
                             .title(String.valueOf(i)));
                 }
+            }
+        }
+        else{
+            FixedLatLngListener fixedListener = new FixedLatLngListener();
+            if (marker.getAlpha() == 1f) {
+                fixedListener.setMap(mMap);
+                fixedListener.setCenter(marker.getPosition());
+                siteOverlay = mMap.addGroundOverlay(new GroundOverlayOptions()
+                        .image(fixedListener.getBmpBounds())
+                        .position(marker.getPosition(), 1000f, 1000f));
+                fixedListener.setOverlay(siteOverlay);
+                mMap.setOnCameraChangeListener(fixedListener);
+                marker.setAlpha(0.6f);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15.0f));
+            }else{
+                marker.setAlpha(1.0f);
+                if(siteOverlay != null)
+                    siteOverlay.remove();
+                mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition cameraPosition) {
+
+                    }
+                });
+                mMap.animateCamera(CameraUpdateFactory.zoomBy(12.0f));
             }
         }
         return false;

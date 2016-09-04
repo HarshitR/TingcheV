@@ -28,7 +28,8 @@ public class CarParkedActivity extends AppCompatActivity {
                 Toast.makeText(mActivity, "Will open the location on map", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(mActivity, CityMapActivity.class)
                         .putExtra("entry_point", "car_parked")
-                        /*.putExtra("lat", 0.0).putExtra("lng",0.0)*/);
+                        .putExtra("lat", 28.5288561)
+                        .putExtra("lng", 76.8011377));
             }
         });
     }
